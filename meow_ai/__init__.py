@@ -1,10 +1,12 @@
 import os
 import sys
 import argparse
-import readline
+try:
+    import readline
+except ImportError:
+    import pyreadline3
 from openai import OpenAI
 from colorama import Fore, Style
-
 
 def main():
     try:
@@ -43,8 +45,6 @@ def main():
             "api_key": args.api_key or os.getenv("OPENAI_API_KEY"),
             "model": args.model or os.getenv("MODEL"),
         }
-        openai = None
-        messages = []
         print("欢迎使用 Meow AI, 按下 Ctrl + C 以退出程序")
         print()
         if config["base_url"] == None:
@@ -80,14 +80,19 @@ def main():
             config["model"] = "gpt-3.5-turbo"
         openai = OpenAI(base_url=config["base_url"], api_key=config["api_key"])
         print("".join([Fore.RED, "警告: 即将进入交互模式. 输入 %help 以获取帮助; 若您使用了 read 参数, 请在消息输入结束后按下 Enter, 然后按下 Ctrl + D, 或不按 Enter, 按两次 Ctrl + D 即可发送消息",Style.RESET_ALL,"\n"]))
+        messages = []
         while True:
+            message:str
             if args.read:
                 print("> ", end="", flush=True)
                 message = sys.stdin.read().strip()
             else:
                 message = input("> ")
+            try:
+                readline.add_history(message)
+            except ModuleNotFoundError:
+                pyreadline3.add_history(message)
             print()
-            readline.add_history(message)
             if message.startswith("%"):
                 command = message[1:].strip()
                 if command == "help":
