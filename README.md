@@ -2,7 +2,7 @@
 
 # Meow AI
 
-以标准的 OpenAI API 格式访问所有 LLM
+以 OpenAI API 格式访问 LLM
 
 </div>
 

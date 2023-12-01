@@ -1,16 +1,15 @@
-import os
-import sys
-import argparse
-
-try:
-    import readline
-except ImportError:
-    import pyreadline3
-from openai import OpenAI
-from colorama import Fore, Style
-
-
 def main():
+    import os
+    import sys
+    import argparse
+
+    try:
+        import readline
+    except ImportError:
+        import pyreadline3
+    from openai import OpenAI
+    from colorama import Fore, Style
+
     try:
         parser = argparse.ArgumentParser(description="Meow AI")
         parser.add_argument(
@@ -34,7 +33,7 @@ def main():
         print("欢迎使用 Meow AI, 按下 Ctrl + C 以退出程序")
         print()
         if config["base_url"] == None:
-            print("".join([Fore.RED, "警告: 没有设置 Base URL, 开始配置", Style.RESET_ALL]))
+            print("".join([Fore.RED, "警告: 没有设置 Base URL, 开始配置.", Style.RESET_ALL]))
             print()
             while True:
                 try:
@@ -54,7 +53,7 @@ def main():
             print("".join([Fore.GREEN, "设置完成!", Style.RESET_ALL]))
             print()
         if config["api_key"] == None:
-            print("".join([Fore.RED, "警告: 没有设置 API Key, 开始配置", Style.RESET_ALL]))
+            print("".join([Fore.RED, "警告: 没有设置 API Key, 开始配置.", Style.RESET_ALL]))
             print()
             while True:
                 try:
@@ -70,7 +69,7 @@ def main():
             print("".join([Fore.GREEN, "设置完成!", Style.RESET_ALL]))
             print()
         if config["model"] == None:
-            print("".join([Fore.RED, "警告: 没有设置 Model, 开始配置", Style.RESET_ALL]))
+            print("".join([Fore.RED, "警告: 没有设置 Model, 开始配置.", Style.RESET_ALL]))
             print()
             while True:
                 try:
@@ -89,6 +88,34 @@ def main():
             print()
             print("".join([Fore.GREEN, "设置完成!", Style.RESET_ALL]))
             print()
+        messages = []
+        print("".join([Fore.RED, "警告: 没有设置 System 提示词, 开始配置.", Style.RESET_ALL]))
+        print()
+        print(
+            "".join(
+                [
+                    Fore.BLUE,
+                    "请输入要使用的模型, 直接回车以不使用 System 提示词. 若您使用了 read 参数, 请在消息输入结束后按下 Enter, 然后按下 Ctrl + D, 或不按 Enter, 按两次 Ctrl + D 即可完成输入 > ",
+                    Style.RESET_ALL,
+                ]
+            ),
+            end="",
+            flush=True,
+        )
+        if args.read:
+            while True:
+                try:
+                    message = sys.stdin.read().strip()
+                    break
+                except EOFError:
+                    continue
+        else:
+            message = sys.stdin.readline().strip()
+        if message:
+            messages.append({"role": "system", "content": message})
+        print()
+        print("".join([Fore.GREEN, "设置完成!", Style.RESET_ALL]))
+        print()
         if not config["base_url"]:
             config["base_url"] = "https://api.openai.com/v1"
         if not config["model"]:
@@ -98,13 +125,12 @@ def main():
             "".join(
                 [
                     Fore.RED,
-                    "警告: 即将进入交互模式. 输入 %help 以获取帮助; 若您使用了 read 参数, 请在消息输入结束后按下 Enter, 然后按下 Ctrl + D, 或不按 Enter, 按两次 Ctrl + D 即可发送消息",
+                    "警告: 即将进入交互模式. 输入 %help 以获取帮助. 若您使用了 read 参数, 请在消息输入结束后按下 Enter, 然后按下 Ctrl + D, 或不按 Enter, 按两次 Ctrl + D 即可发送消息.",
                     Style.RESET_ALL,
                     "\n",
                 ]
             )
         )
-        messages = []
         while True:
             message: str
             print("> ", end="", flush=True)
